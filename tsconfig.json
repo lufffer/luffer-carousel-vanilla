@@ -4,15 +4,24 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "declarationMap": true,
-    "emitDeclarationOnly": true,
     "esModuleInterop": true,
-    "module": "es6",
+    "isolatedModules": true,
+    "module": "esnext",
     "moduleResolution": "node",
+    "noEmit": false,
     "noImplicitAny": true,
-    "outDir": "./dist",
-    "plugins": [{ "name": "typescript-plugin-css-modules" }],
+    "outDir": "dist",
     "removeComments": true,
     "sourceMap": true,
-    "typeRoots": ["node_modules/@types", "src/types"]
-  }
+    "strict": true
+  },
+  "exclude": [
+    "node_modules",
+    "config",
+    "dist",
+    "src/data",
+    "*.js",
+    "src/index.ts"
+  ],
+  "include": ["src/**/*"]
 }
