@@ -26,6 +26,7 @@ const config = {
     buttons: true,
     indicators: true,
     dragging: true,
+    draggingMobile: true
 }
 
 document.body.appendChild(new Carousel(data, config).getCarousel())
@@ -37,7 +38,7 @@ object where you can pass a class for the most extern div which wrap the whole c
 a buttons property which is a boolean that allows you to add buttons
 to move to the next and previous image in the carousel,
 an indicators property to allows you to move to any image in the carousel
-and a dragging property to enable dragging.
+and dragging properties to enable dragging when using touchscreen or a mouse.
 The getCarousel method returns the carousel.
 By default when you import the main.css file, it adds a class with the next properties
 
@@ -58,7 +59,8 @@ const config = {
     class: "carousel",
     buttons: true,
     indicators: true,
-    dragging: true
+    dragging: true,
+    draggingMobile: true
 }
 ```
 
