@@ -1,4 +1,5 @@
-import styles from './default.module.css';
+// Change buttons background color
+import styles from './styles.module.css';
 import defaultConfig from './config/config';
 import leftButton from './assets/chevron left.svg';
 import rightButton from './assets/chevron right.svg';
@@ -9,9 +10,10 @@ type Data = {
 
 type Config = {
   class?: string;
-  buttons: boolean;
-  draggable: boolean;
-  indicators: boolean;
+  buttons?: boolean;
+  draggable?: boolean;
+  draggableMobile?: boolean;
+  indicators?: boolean;
 };
 
 interface Carousel {
@@ -23,9 +25,10 @@ export default class LufferCarouselVanilla implements Carousel {
   private config: Config;
   private $carousel: HTMLDivElement = document.createElement('div');
   private $slider: HTMLDivElement = document.createElement('div');
+  private $indicators: Array<HTMLDivElement> = [];
   private current: number = 0;
 
-  constructor(data: Array<Data>, config: Config) {
+  constructor(data: Array<Data>, config?: Config) {
     this.data = data;
     this.config = { ...defaultConfig, ...config };
   }
@@ -68,7 +71,7 @@ export default class LufferCarouselVanilla implements Carousel {
   // Creates an indicator and returns it
   private createIndicator = (i: number): HTMLDivElement => {
     const $INDICATOR = document.createElement('div');
-    $INDICATOR.setAttribute('class', styles.indicator);
+    $INDICATOR.setAttribute('class', `${styles.indicator} ${i === 0 ? styles['current-indicator'] : ''}`);
     $INDICATOR.setAttribute('data-pos', `${i}`);
     $INDICATOR.addEventListener('click', this.moveTo);
     return $INDICATOR;
@@ -91,6 +94,7 @@ export default class LufferCarouselVanilla implements Carousel {
     for (let i = 0; i < this.data.length; ++i) {
       const $INDICATOR = this.createIndicator(i);
       $INDICATORS.appendChild($INDICATOR);
+      this.$indicators.push($INDICATOR);
     }
   };
 
@@ -105,21 +109,31 @@ export default class LufferCarouselVanilla implements Carousel {
   private addDraggable = (): void => {
     let dragstart = 0;
     let dragend = 0;
-    this.$slider.addEventListener('mousedown', (e) => (dragstart = e.clientX));
-    this.$slider.addEventListener('mouseup', (e) => {
-      dragend = e.clientX;
+
+    const handleDragStart = (e: TouchEvent|MouseEvent) => {
+      dragstart = e.type === 'touchstart' ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
+    };
+
+    const handleDragEnd = (e: TouchEvent|MouseEvent) => {
+      dragend = e.type === 'touchend' ? (e as TouchEvent).changedTouches[0].clientX : (e as MouseEvent).clientX;
       const dragdiff = dragend - dragstart;
       if (dragdiff > 0 && dragdiff > 25) {
         this.previous();
       } else if (dragdiff < 0 && dragdiff < -25) {
         this.next();
       }
-    });
+    };
+    
+    this.$slider.addEventListener('touchstart', handleDragStart);
+    this.$slider.addEventListener('touchend', handleDragEnd);
+    this.$slider.addEventListener('mousedown', handleDragStart);
+    this.$slider.addEventListener('mouseup', handleDragEnd);
   };
 
   // Moves to next image
   private next = (): void => {
     if (this.current === this.data.length - 1) return;
+    this.$indicators[this.current].classList.remove(styles['current-indicator']);
     ++this.current;
     this.move();
   };
@@ -127,12 +141,14 @@ export default class LufferCarouselVanilla implements Carousel {
   // Moves to previous image
   private previous = (): void => {
     if (this.current === 0) return;
+    this.$indicators[this.current].classList.remove(styles['current-indicator']);
     --this.current;
     this.move();
   };
 
   // Update the current position to the position of the image which matches the clicked indicator's position and moves to it
   private moveTo = (e: MouseEvent): void => {
+    this.$indicators[this.current].classList.remove(styles['current-indicator']);
     this.current = parseInt((e.target as HTMLDivElement).dataset.pos!);
     this.move();
   };
@@ -141,6 +157,7 @@ export default class LufferCarouselVanilla implements Carousel {
   private move = (): void => {
     this.$slider.style.transform = `translateX(-${this.$carousel.clientWidth * this.current
     }px)`;
+    this.$indicators[this.current].classList.add(styles['current-indicator']);
   };
 
   // Returns a new carousel
