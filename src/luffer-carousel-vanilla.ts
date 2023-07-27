@@ -124,10 +124,14 @@ export default class LufferCarouselVanilla implements Carousel {
       }
     };
     
-    this.$slider.addEventListener('touchstart', handleDragStart);
-    this.$slider.addEventListener('touchend', handleDragEnd);
-    this.$slider.addEventListener('mousedown', handleDragStart);
-    this.$slider.addEventListener('mouseup', handleDragEnd);
+    if (this.config.draggableMobile) {
+      this.$slider.addEventListener('touchstart', handleDragStart);
+      this.$slider.addEventListener('touchend', handleDragEnd);
+    }
+    if (this.config.draggable) {
+      this.$slider.addEventListener('mousedown', handleDragStart);
+      this.$slider.addEventListener('mouseup', handleDragEnd);
+    }
   };
 
   // Moves to next image
@@ -166,7 +170,7 @@ export default class LufferCarouselVanilla implements Carousel {
     this.addImages();
     if (this.config.buttons) this.addButtons();
     if (this.config.indicators) this.addIndicators();
-    if (this.config.draggable) this.addDraggable();
+    if (this.config.draggable || this.config.draggableMobile) this.addDraggable();
     return this.$carousel;
   };
 }
